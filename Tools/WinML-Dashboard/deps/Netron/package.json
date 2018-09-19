@@ -1,0 +1,28 @@
+{
+    "name": "Netron",
+    "author": {
+        "name": "Lutz Roeder",
+        "email": "lutzroeder@users.noreply.github.com",
+        "url": "lutzroeder.com"
+    },
+    "version": "1.9.9",
+    "description": "Viewer neural network models",
+    "license": "MIT",
+    "repository": "lutzroeder/Netron",
+    "main": "src/app.js",
+    "dependencies": {
+        "d3": "latest",
+        "dagre": "latest",
+        "electron-updater": "^3.0.3",
+        "flatbuffers": "latest",
+        "handlebars": "latest",
+        "marked": "latest",
+        "npm-font-open-sans": "latest",
+        "protobufjs": "latest",
+        "universal-analytics": "latest"
+    },
+    "devDependencies": {
+        "electron": "latest",
+        "electron-builder": "latest"
+    }
+}

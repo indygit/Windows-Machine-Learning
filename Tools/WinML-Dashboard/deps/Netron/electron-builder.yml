@@ -1,0 +1,58 @@
+appId: com.lutzroeder.netron
+productName: Netron
+files:
+  - 'src/**/*'
+directories:
+  buildResources: setup
+  output: ./build/electron
+fileAssociations:
+  - name: "ONNX Model"
+    ext: onnx
+  - name: "TensorFlow Lite Model"
+    ext: tflite
+  - name: "Keras Model"
+    ext: h5
+  - name: "Keras Model"
+    ext: keras
+  - name: "CoreML Model"
+    ext: mlmodel
+  - name: "MXNet Model"
+    ext: model
+  - name: "Caffe Model"
+    ext: caffemodel
+  - name: "TensorFlow Meta Graph"
+    ext: meta
+  - name: "TensorFlow Graph"
+    ext: pb
+  - name: "TensorFlow Saved Model"
+    ext: pb
+  - name: "ONNX Model"
+    ext: pb
+  - name: "Caffe2 Model"
+    ext: pb
+publish:
+  - provider: github
+    releaseType: release
+mac:
+  category: public.app-category.developer-tools
+  target: 
+  - dmg
+  - zip
+linux:
+  target:
+  - AppImage
+  - deb
+win:
+  target:
+  - nsis
+dmg:
+  iconSize: 160
+  contents:
+  - x: 180
+    y: 170
+  - x: 480
+    y: 170
+    type: link
+    path: /Applications
+nsis:
+  perMachine: true

@@ -1,0 +1,127 @@
+#!/usr/bin/python
+
+import distutils
+import io
+import json
+import os
+import setuptools
+import setuptools.command.build_py
+
+node_dependencies = [ 
+    ( 'netron', [
+        'node_modules/d3/dist/d3.min.js',
+        'node_modules/dagre/dist/dagre.min.js',
+        'node_modules/handlebars/dist/handlebars.min.js',
+        'node_modules/marked/marked.min.js',
+        'node_modules/protobufjs/dist/protobuf.min.js',
+        'node_modules/flatbuffers/js/flatbuffers.js',
+        'node_modules/npm-font-open-sans/open-sans.css' ]),
+    ( 'netron/fonts/Regular', [
+        'node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.eot',
+        'node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.svg',
+        'node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.ttf',
+        'node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.woff',
+        'node_modules/npm-font-open-sans/fonts/Regular/OpenSans-Regular.woff2' ]),
+    ( 'netron/fonts/Semibold', [
+        'node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.eot',
+        'node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.svg',
+        'node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.ttf',
+        'node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.woff',
+        'node_modules/npm-font-open-sans/fonts/Semibold/OpenSans-Semibold.woff2' ]),
+    ( 'netron/fonts/Bold', [
+        'node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.eot',
+        'node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.svg',
+        'node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.ttf',
+        'node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.woff',
+        'node_modules/npm-font-open-sans/fonts/Bold/OpenSans-Bold.woff2' ])
+]
+
+class build_py(setuptools.command.build_py.build_py):
+    def run(self):
+        result = setuptools.command.build_py.build_py.run(self)
+        for target, files in node_dependencies:
+            target = os.path.join(self.build_lib, target)
+            if not os.path.exists(target):
+                os.makedirs(target)
+            for file in files:
+                self.copy_file(file, target)
+        return result
+    def build_module(self, module, module_file, package):
+        setuptools.command.build_py.build_py.build_module(self, module, module_file, package)
+        if module == '__version__':
+            package = package.split('.')
+            outfile = self.get_module_outfile(self.build_lib, package, module)
+            with open(outfile, 'w+') as f:
+                f.write("__version__ = '" + package_version() + "'\n")
+
+def package_version():
+    folder = os.path.realpath(os.path.dirname(__file__))
+    with open(os.path.join(folder, 'package.json')) as package_file:
+        package_manifest = json.load(package_file)
+        return package_manifest['version']
+
+setuptools.setup(
+    name="netron",
+    version=package_version(),
+    description="Viewer for neural network, deep learning and machine learning models",
+    long_description='Netron is a viewer for neural network, deep learning and machine learning models.\n\n' +
+                     'Netron supports **ONNX** (`.onnx`, `.pb`), **Keras** (`.h5`, `.keras`), **CoreML** (`.mlmodel`) and **TensorFlow Lite** (`.tflite`). Netron has experimental support for **Caffe** (`.caffemodel`), **Caffe2** (`predict_net.pb`), **MXNet** (`-symbol.json`), **TensorFlow.js** (`model.json`, `.pb`) and **TensorFlow** (`.pb`, `.meta`).',
+    keywords=[
+        'onnx', 'keras', 'tensorflow', 'coreml', 'mxnet', 'caffe', 'caffe2',
+        'artificial intelligence', 'machine learning', 'deep learning', 'neural network',
+        'visualizer', 'viewer'
+    ],
+    license="MIT",
+    cmdclass={
+        'build_py': build_py
+    },
+    package_dir={
+        'netron': 'src'
+    },
+    packages=[
+        'netron'
+    ],
+    package_data={
+        'netron': [ 
+            'netron', 'netron.py',
+            'logo.svg', 'spinner.svg', 'favicon.ico', 'icon.png',
+            'onnx-model.js', 'onnx.js', 'onnx-metadata.json',
+            'tf-model.js', 'tf.js', 'tf-metadata.json',
+            'tflite-model.js', 'tflite.js', 'tflite-metadata.json',
+            'keras-model.js', 'keras-metadata.json', 'hdf5.js',
+            'coreml-model.js', 'coreml-metadata.json', 'coreml.js',
+            'caffe-model.js', 'caffe-metadata.json', 'caffe.js',
+            'caffe2-model.js', 'caffe2-metadata.json', 'caffe2.js',
+            'mxnet-model.js', 'mxnet-metadata.json', 'unzip.js',
+            'pytorch-model.js', 'pytorch-metadata.json', 'pickle.js',
+            'numpy.js',
+            'view-browser.html', 'view-browser.js',
+            'view-render.css', 'view-render.js',
+            'view-sidebar.css', 'view-sidebar.js',
+            'view.js', 'view.css'
+        ]
+    },
+    install_requires=[],
+    author='Lutz Roeder',
+    author_email='lutzroeder@users.noreply.github.com',
+    url='https://github.com/lutzroeder/Netron',
+    scripts=[
+        'src/netron'
+    ],
+    classifiers=[
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Software Development',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Mathematics',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Scientific/Engineering :: Visualization'
+    ]
+)
