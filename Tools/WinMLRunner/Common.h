@@ -1,6 +1,8 @@
 #pragma once
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+#include <vcruntime.h>
+#include <windows.h>
 #include <winrt/Windows.AI.MachineLearning.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Media.h>
@@ -18,7 +20,9 @@
 #include <numeric>
 #include <cassert>
 #include <fstream>
+#include <Windows.AI.MachineLearning.Native.h>
 #include <dxgi1_6.h>
+#include <d3d12.h>
 
 enum WINML_MODEL_TEST_PERF
 {

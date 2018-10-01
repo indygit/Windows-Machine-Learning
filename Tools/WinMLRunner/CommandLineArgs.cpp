@@ -15,6 +15,7 @@ void CommandLineArgs::PrintUsage() {
     std::cout << "  -GPU : run model on default GPU" << std::endl;
     std::cout << "  -GPUHighPerformance : run model on GPU with highest performance" << std::endl;
     std::cout << "  -GPUMinPower : run model on GPU with the least power" << std::endl;
+    std::cout << "  -GPUAdapterIndex : run model on GPU specified by its index in DXGI enumeration" << std::endl;
     std::cout << "  -perf : capture timing measurements" << std::endl;
     std::cout << "  -iterations : # times perf measurements will be run/averaged" << std::endl;
     std::cout << "  -input <fully qualified path>: binds image or CSV to model" << std::endl;
@@ -46,6 +47,11 @@ CommandLineArgs::CommandLineArgs()
         {
             m_useGPU = true;
             m_deviceKind = LearningModelDeviceKind::DirectXMinPower;
+        }
+        else if ((_wcsicmp(args[i], L"-GPUAdapterIndex") == 0) && (i + 1 < numArgs))
+        {
+            m_useGPU = true;
+            m_adapterIndex = static_cast<UINT>(_wtoi(args[++i]));
         }
         if ((_wcsicmp(args[i], L"-iterations") == 0) && (i + 1 < numArgs))
         {

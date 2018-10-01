@@ -11,6 +11,7 @@ public:
     bool UseGPU() const { return m_useGPU; }
     bool UseCPUandGPU() const { return m_useCPUandGPU; }
     Windows::AI::MachineLearning::LearningModelDeviceKind DeviceKind() const { return m_deviceKind; }
+    UINT GPUAdapterIndex() const { return m_adapterIndex;  }
     bool PerfCapture() const { return m_perfCapture; }
     bool EnableDebugOutput() const { return m_debug;  }
    
@@ -30,6 +31,7 @@ private:
     bool m_useCPUandGPU = false;
     bool m_debug = false;
     Windows::AI::MachineLearning::LearningModelDeviceKind m_deviceKind = Windows::AI::MachineLearning::LearningModelDeviceKind::DirectX;
+    UINT m_adapterIndex = -1;
 
     std::wstring m_modelFolderPath;
     std::wstring m_modelPath;

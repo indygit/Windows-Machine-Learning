@@ -7,6 +7,8 @@
 
 Profiler<WINML_MODEL_TEST_PERF> g_Profiler;
 
+#define RETURN_IF_FAILED(hr) { if (FAILED(hr)) return hr; }
+
 // Binds and evaluates the user-specified model and outputs success/failure for each step. If the
 // perf flag is used, it will output the CPU, GPU, and wall-clock time for each step to the
 // command-line and to a CSV file.
@@ -21,9 +23,53 @@ HRESULT EvaluateModel(LearningModel model, const CommandLineArgs& args, OutputHe
     // Timer measures wall-clock time between the last two start/stop calls.
     Timer timer;
 
+    com_ptr<::IUnknown> spUnkLearningModelDevice;
+    UINT adapterIndex = args.GPUAdapterIndex();
+
+    if ((deviceKind != LearningModelDeviceKind::Cpu) && (adapterIndex != -1))
+    {
+        HRESULT hr = S_OK;
+
+        com_ptr<IDXGIFactory1> dxgiFactory1;
+        hr = CreateDXGIFactory1(__uuidof(IDXGIFactory), dxgiFactory1.put_void());
+        RETURN_IF_FAILED(hr);
+
+        com_ptr<IDXGIAdapter1> dxgiAdapter1;
+        hr = dxgiFactory1->EnumAdapters1(adapterIndex, dxgiAdapter1.put());
+        if (FAILED(hr))
+        {
+            printf("Invalid adapter index : %d\n", adapterIndex);
+            return hr;
+        }
+
+        DXGI_ADAPTER_DESC1 adapterDesc1;
+        dxgiAdapter1->GetDesc1(&adapterDesc1);
+        printf("Use adapter : %S\n", adapterDesc1.Description);
+
+        com_ptr<ID3D12Device> d3d12Device;
+        hr = D3D12CreateDevice(dxgiAdapter1.get(), D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device), d3d12Device.put_void());
+        RETURN_IF_FAILED(hr);
+
+        com_ptr<ID3D12CommandQueue> d3d12CommandQueue;
+        D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
+        commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+
+        hr = d3d12Device->CreateCommandQueue(&commandQueueDesc, __uuidof(ID3D12CommandQueue), d3d12CommandQueue.put_void());
+        RETURN_IF_FAILED(hr);
+
+        auto factory = get_activation_factory<LearningModelDevice, ILearningModelDeviceFactoryNative>();
+
+        hr = factory->CreateFromD3D12CommandQueue(d3d12CommandQueue.get(), spUnkLearningModelDevice.put());
+        RETURN_IF_FAILED(hr);
+    }
+    else
+    {
+        spUnkLearningModelDevice = LearningModelDevice(deviceKind).as<::IUnknown>();
+    }
+
     try
     {
-        session =  LearningModelSession(model, LearningModelDevice(deviceKind));
+        session =  LearningModelSession(model, spUnkLearningModelDevice.as<LearningModelDevice>());
     }
     catch (hresult_error hr)
     {
