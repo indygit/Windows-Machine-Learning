@@ -47,7 +47,7 @@ HRESULT EvaluateModel(LearningModel model, const CommandLineArgs& args, OutputHe
         printf("Use adapter : %S\n", adapterDesc1.Description);
 
         com_ptr<ID3D12Device> d3d12Device;
-        hr = D3D12CreateDevice(dxgiAdapter1.get(), D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device), d3d12Device.put_void());
+        hr = D3D12CreateDevice(dxgiAdapter1.get(), D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), d3d12Device.put_void());
         RETURN_IF_FAILED(hr);
 
         com_ptr<ID3D12CommandQueue> d3d12CommandQueue;
