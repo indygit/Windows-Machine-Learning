@@ -216,16 +216,30 @@ public:
     {
         std::cout << "WinML Runner" << std::endl;
 
+        std::cout << std::endl;
+
         com_ptr<IDXGIFactory6> factory;
         (CreateDXGIFactory1(__uuidof(IDXGIFactory6), factory.put_void()));
         com_ptr<IDXGIAdapter> adapter;
-        factory->EnumAdapters(0, adapter.put());
-        DXGI_ADAPTER_DESC description;
-        if (SUCCEEDED(adapter->GetDesc(&description)))
+
+        for (UINT i = 0; ; i++)
         {
-            std::wcout << L"GPU: " << description.Description << std::endl;
-            std::cout << std::endl;
+            HRESULT hr = factory->EnumAdapters(i, adapter.put());
+            if (FAILED(hr))
+            {
+                break;
+            }
+
+            DXGI_ADAPTER_DESC description;
+            if (SUCCEEDED(adapter->GetDesc(&description)))
+            {
+                std::wcout << L"GPU " << i << ": " << description.Description << std::endl;
+            }
+
+            adapter.detach()->Release();
         }
+
+        std::cout << std::endl;
     }
 
     void SetDefaultCSVFileName() 
