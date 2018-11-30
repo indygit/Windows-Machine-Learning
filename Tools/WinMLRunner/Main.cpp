@@ -313,7 +313,7 @@ HRESULT EvaluateModel(
     // Add one more iteration if we ignore the first run
     uint32_t numIterations = args.NumIterations() + args.IgnoreFirstRun();
 
-    bool isGarbageData = !args.CsvPath().empty() || !args.ImagePath().empty();
+    bool isGarbageData = args.CsvPath().empty() && args.ImagePath().empty();
 
     // Run the binding + evaluate multiple times and average the results
     for (uint32_t i = 0; i < numIterations; i++)
